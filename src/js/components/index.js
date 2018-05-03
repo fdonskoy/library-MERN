@@ -1,20 +1,19 @@
-import React, { Component} from 'react'
-import ReactDOM from 'react-dom'
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 
-class Layout extends Component {
-  constructor () {
-    super()
-    this.state = {
-      name: 'Joe'
-    }
-  }
-  render () {
-    return (<div className='home'>
-        Firuoussst
-      </div>)
-  }
+//Components
+import Book from './Book.js';
+
+class App extends Component {
+	constructor() {
+		super();
+		this.state = {};
+	}
+	render() {
+		return <Book />;
+	}
 }
 
-const app = document.getElementById('app')
+const app = document.getElementById('app');
 
-ReactDOM.render(<Layout />, app)
+ReactDOM.render(<App />, app);

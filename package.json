@@ -1,37 +1,48 @@
 {
-  "name": "starterkit",
-  "version": "1.0.0",
-  "description": "web tools for live reloading and bundling, environment setup for web development",
-  "main": "index.js",
-  "scripts": {
-    "bundle": "./node_modules/.bin/webpack",
-    "production": "./node_modules/.bin/webpack -p",
-    "watch": "gulp"
-  },
-  "author": "Fil",
-  "license": "ISC",
-  "devDependencies": {
-    "gulp": "^3.9.1"
-  },
-  "dependencies": {
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.2",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-react": "^6.24.1",
-    "babel-preset-stage-0": "^6.24.1",
-    "browser-sync": "^2.23.6",
-    "browserify": "^16.1.0",
-    "gulp-autoprefixer": "^4.1.0",
-    "gulp-clean-css": "^3.9.2",
-    "gulp-sass": "^3.1.0",
-    "gulp-shell": "^0.6.5",
-    "gulp-sourcemaps": "^2.6.4",
-    "gulp-uglify": "^3.0.0",
-    "gulp-uglify-es": "^1.0.1",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
-    "webpack": "^3.11.0"
-  }
+	"name": "starterkit",
+	"version": "1.0.0",
+	"description":
+		"web tools for live reloading and bundling, environment setup for web development",
+	"main": "index.js",
+	"scripts": {
+		"bundle": "./node_modules/.bin/webpack",
+		"production": "./node_modules/.bin/webpack -p",
+		"watch": "gulp",
+		"server": "node ./server/server.js",
+		"dev": "concurrently --kill-others \"npm run watch\" \"npm run server\""
+	},
+	"author": "Fil",
+	"license": "ISC",
+	"devDependencies": {
+		"concurrently": "^3.5.1",
+		"gulp": "^3.9.1"
+	},
+	"dependencies": {
+		"axios": "^0.18.0",
+		"babel-core": "^6.26.0",
+		"babel-loader": "^7.1.2",
+		"babel-plugin-transform-class-properties": "^6.24.1",
+		"babel-preset-env": "^1.6.1",
+		"babel-preset-es2015": "^6.24.1",
+		"babel-preset-react": "^6.24.1",
+		"babel-preset-stage-0": "^6.24.1",
+		"body-parser": "^1.18.2",
+		"browser-sync": "^2.23.6",
+		"browserify": "^16.1.0",
+		"express": "^4.16.3",
+		"foreman": "^2.0.0",
+		"gulp-autoprefixer": "^4.1.0",
+		"gulp-clean-css": "^3.9.2",
+		"gulp-sass": "^3.1.0",
+		"gulp-shell": "^0.6.5",
+		"gulp-sourcemaps": "^2.6.4",
+		"gulp-uglify": "^3.0.0",
+		"gulp-uglify-es": "^1.0.1",
+		"marked": "^0.3.19",
+		"mongoose": "^5.0.17",
+		"nodemon": "^1.17.3",
+		"react": "^16.2.0",
+		"react-dom": "^16.2.0",
+		"webpack": "^3.11.0"
+	}
 }
