@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
 //Components
-import Book from './Book.js';
+import BookCollection from './BookCollection.js';
 
 class App extends Component {
 	constructor() {
@@ -10,7 +10,12 @@ class App extends Component {
 		this.state = {};
 	}
 	render() {
-		return <Book />;
+		return (
+			<BookCollection
+				url="http://localhost:3001/api/books"
+				pollInterval={2000}
+			/>
+		);
 	}
 }
 

@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 
-export default class Book extends Component {
-	constructor() {
-		super();
-		this.state = {
-			name: 'Filip'
-		};
+let Book = props => {
+	if (!(props.author && props.text)) {
+		return null;
 	}
-	render() {
-		return <div className="home">{this.state.name}</div>;
-	}
-}
+	return (
+		<div>
+			Author: {props.author}
+			<br />Text: {props.text}
+		</div>
+	);
+};
+
+module.exports = Book;
