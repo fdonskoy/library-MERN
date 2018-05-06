@@ -6,15 +6,7 @@ export default class Book extends Component {
 		this.state = {
 			toBeUpdated: false,
 			author: '',
-			title: '',
-			genre: '', //type enumerable
-			description: '',
-			image: {
-				thumbnail: '',
-				large: ''
-			},
-			price: '',
-			inCart: false
+			text: ''
 		};
 
 		//binding all our functions to this class
@@ -37,12 +29,13 @@ export default class Book extends Component {
 		//if author or text changed, set it. if not, leave null and our PUT
 		//request will ignore it.
 		let author = this.state.author ? this.state.author : null;
-		// let text = this.state.text ? this.state.text : null;
-		let book = { author };
+		let text = this.state.text ? this.state.text : null;
+		let book = { author: author, text: text };
 		this.props.onBookUpdate(id, book);
 		this.setState({
 			toBeUpdated: !this.state.toBeUpdated,
-			author: ''
+			author: '',
+			text: ''
 		});
 	}
 
@@ -60,17 +53,13 @@ export default class Book extends Component {
 	}
 
 	render() {
-		if (!this.props.title) {
-			// return null;
+		if (!(this.props.author && this.props.text)) {
+			return null;
 		}
 		return (
 			<div>
-				<img src={`images/${this.props.uniqueID}.jpg`} />
-				Title: {this.props.title}
-				<br />Author: {this.props.author}
-				<br />Genre: {this.props.genre}
-				<br />Description: {this.props.description}
-				<br />Price: {this.props.price}
+				Author: {this.props.author}
+				<br />Text: {this.props.text}
 				<br />
 				<a href="#" onClick={this.updateBook}>
 					update
@@ -89,7 +78,7 @@ export default class Book extends Component {
 						<input
 							type="text"
 							placeholder="Update your book…"
-							value={this.state.genre}
+							value={this.state.text}
 							onChange={this.handleTextChange}
 						/>
 						<input type="submit" value="Update" />

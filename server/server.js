@@ -66,9 +66,42 @@ router
 		let book = new Book();
 		//body parser lets us use the req.body
 		book.author = req.body.author;
-		book.text = req.body.text;
+		book.description = req.body.description;
+		book.genre = req.body.genre;
+		book.price = req.body.price;
+		book.title = req.body.title;
+
 		book.save(function(err) {
 			if (err) res.send(err);
 			res.json({ message: 'Book successfully added!' });
+		});
+	});
+
+//Add this after our get and post routes
+//Adding a route to a specific book based on the database ID
+router
+	.route('/books/:book_id')
+	//The put method gives us the chance to update our book based on
+	//the ID passed to the route
+	.put(function(req, res) {
+		Book.findById(req.params.book_id, function(err, book) {
+			if (err) res.send(err);
+			//setting the new author and text to whatever was changed. If
+			//nothing was changed we will not alter the field.
+			req.body.author ? (book.author = req.body.author) : null;
+			req.body.text ? (book.text = req.body.text) : null;
+			//save book
+			book.save(function(err) {
+				if (err) res.send(err);
+				res.json({ message: 'Book has been updated' });
+			});
+		});
+	})
+	//delete method for removing a book from our database
+	.delete(function(req, res) {
+		//selects the book by its ID, then removes it.
+		Book.remove({ _id: req.params.book_id }, function(err, book) {
+			if (err) res.send(err);
+			res.json({ message: 'Book has been deleted' });
 		});
 	});
