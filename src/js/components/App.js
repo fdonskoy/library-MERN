@@ -8,10 +8,12 @@ export default class App extends Component {
 	constructor() {
 		super();
 		this.state = {
-			genre: 'All'
+			genre: 'All',
+			searchInput: ''
 		};
 
 		this.handleCategoryFilter = this.handleCategoryFilter.bind(this);
+		this.handleSearch = this.handleSearch.bind(this);
 	}
 
 	handleCategoryFilter(genre) {
@@ -21,13 +23,24 @@ export default class App extends Component {
 		});
 	}
 
+	handleSearch(searchInput) {
+		console.log('filtered by search', searchInput);
+		this.setState({
+			searchInput
+		});
+	}
+
 	render() {
 		return (
 			<div>
-				<NavBar handleCategoryFilter={this.handleCategoryFilter} />
+				<NavBar
+					handleCategoryFilter={this.handleCategoryFilter}
+					handleSearch={this.handleSearch}
+				/>
 				<BookCollection
 					url="http://localhost:3001/api/books"
 					filterGenre={this.state.genre}
+					searchInput={this.state.searchInput}
 				/>
 			</div>
 		);

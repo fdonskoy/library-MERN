@@ -73,10 +73,12 @@ var App = function (_Component) {
 		var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this));
 
 		_this.state = {
-			genre: 'All'
+			genre: 'All',
+			searchInput: ''
 		};
 
 		_this.handleCategoryFilter = _this.handleCategoryFilter.bind(_this);
+		_this.handleSearch = _this.handleSearch.bind(_this);
 		return _this;
 	}
 
@@ -89,15 +91,27 @@ var App = function (_Component) {
 			});
 		}
 	}, {
+		key: 'handleSearch',
+		value: function handleSearch(searchInput) {
+			console.log('filtered by search', searchInput);
+			this.setState({
+				searchInput: searchInput
+			});
+		}
+	}, {
 		key: 'render',
 		value: function render() {
 			return _react2.default.createElement(
 				'div',
 				null,
-				_react2.default.createElement(_NavBar2.default, { handleCategoryFilter: this.handleCategoryFilter }),
+				_react2.default.createElement(_NavBar2.default, {
+					handleCategoryFilter: this.handleCategoryFilter,
+					handleSearch: this.handleSearch
+				}),
 				_react2.default.createElement(_BookCollection2.default, {
 					url: 'http://localhost:3001/api/books',
-					filterGenre: this.state.genre
+					filterGenre: this.state.genre,
+					searchInput: this.state.searchInput
 				})
 			);
 		}
@@ -220,10 +234,11 @@ var BookCollection = function (_Component) {
 		key: 'componentWillReceiveProps',
 		value: function componentWillReceiveProps(nextProps) {
 			var filterGenre = nextProps.filterGenre;
+			var searchInput = nextProps.searchInput;
 
 			var books = this.state.data;
 
-			//check if the books already exist to be filtered (if user searches for a book and comes up with empty set)
+			//check if the books exist
 			if (books === undefined || books.length == 0) {
 				return;
 			}
@@ -234,6 +249,27 @@ var BookCollection = function (_Component) {
 				if (!(filterGenre === 'All')) {
 					books = books.filter(function (book) {
 						return book.genre === filterGenre;
+					});
+					this.setState({
+						books: books
+					});
+				} else {
+					books = this.state.data;
+					this.setState({
+						books: books
+					});
+				}
+			}
+
+			//search available books by search input
+			if (this.props.searchInput != nextProps.searchInput) {
+				//return all the books in the current state if the input is blank
+				if (!(searchInput === undefined || searchInput === '')) {
+					books = books.filter(function (book) {
+						var title = book.title;
+						title = title.toLowerCase();
+						var input = searchInput.toLowerCase();
+						return title.includes(input);
 					});
 					this.setState({
 						books: books
@@ -575,6 +611,7 @@ var NavBar = function (_Component) {
 		_this.state = {};
 
 		_this.handleCategoryFilter = _this.handleCategoryFilter.bind(_this);
+		_this.handleSearch = _this.handleSearch.bind(_this);
 		return _this;
 	}
 
@@ -586,6 +623,13 @@ var NavBar = function (_Component) {
 			this.props.handleCategoryFilter(genre);
 		}
 	}, {
+		key: "handleSearch",
+		value: function handleSearch(e) {
+			e.preventDefault();
+			var keyword = this.refs.searchField.value;
+			this.props.handleSearch(keyword);
+		}
+	}, {
 		key: "render",
 		value: function render() {
 			return _react2.default.createElement(
@@ -593,10 +637,13 @@ var NavBar = function (_Component) {
 				null,
 				_react2.default.createElement(
 					"form",
-					{ action: "/action_page.php", id: "filterForm" },
-					"Firstname:",
-					_react2.default.createElement("input", { type: "text", name: "bookName" }),
-					_react2.default.createElement("input", { type: "submit" })
+					{ onSubmit: this.handleSearch, id: "filterForm" },
+					_react2.default.createElement("input", {
+						type: "search",
+						name: "bookName",
+						placeholder: "Find A Book",
+						ref: "searchField"
+					})
 				),
 				_react2.default.createElement(
 					"select",
@@ -634,6 +681,16 @@ var NavBar = function (_Component) {
 						"option",
 						{ value: "Science" },
 						"Science"
+					)
+				),
+				_react2.default.createElement(
+					"div",
+					{ className: "cart" },
+					_react2.default.createElement(
+						"button",
+						{ id: "cart" },
+						"Cart ",
+						this.props.bookCount
 					)
 				)
 			);

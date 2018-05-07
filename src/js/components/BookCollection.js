@@ -63,9 +63,10 @@ export default class BookCollection extends Component {
 
 	componentWillReceiveProps(nextProps) {
 		const { filterGenre } = nextProps;
+		const { searchInput } = nextProps;
 		let books = this.state.data;
 
-		//check if the books already exist to be filtered (if user searches for a book and comes up with empty set)
+		//check if the books exist
 		if (books === undefined || books.length == 0) {
 			return;
 		}
@@ -76,6 +77,27 @@ export default class BookCollection extends Component {
 			if (!(filterGenre === 'All')) {
 				books = books.filter(book => {
 					return book.genre === filterGenre;
+				});
+				this.setState({
+					books
+				});
+			} else {
+				books = this.state.data;
+				this.setState({
+					books
+				});
+			}
+		}
+
+		//search available books by search input
+		if (this.props.searchInput != nextProps.searchInput) {
+			//return all the books in the current state if the input is blank
+			if (!(searchInput === undefined || searchInput === '')) {
+				books = books.filter(book => {
+					let title = book.title;
+					title = title.toLowerCase();
+					let input = searchInput.toLowerCase();
+					return title.includes(input);
 				});
 				this.setState({
 					books
