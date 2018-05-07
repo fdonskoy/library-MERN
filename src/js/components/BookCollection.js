@@ -118,6 +118,14 @@ export default class BookCollection extends Component {
 	render() {
 		let books = this.state.books.map((book, index) => {
 			let id = book._id;
+			let count = 0;
+
+			for (let item in this.props.booksInCart) {
+				if (item['_id'] == id) {
+					count = item.count;
+				}
+			}
+
 			return (
 				<Book
 					author={book.author}
@@ -126,10 +134,13 @@ export default class BookCollection extends Component {
 					description={book.description}
 					price={book.price}
 					image={book.image}
+					count={count}
+					book={book}
 					key={book['_id']}
 					uniqueID={book['_id']}
 					onBookDelete={this.handleBookDelete}
 					onBookUpdate={this.handleBookUpdate}
+					handleCart={this.props.handleCart}
 				/>
 			);
 		});

@@ -74,11 +74,17 @@ var App = function (_Component) {
 
 		_this.state = {
 			genre: 'All',
-			searchInput: ''
+			searchInput: '',
+			booksInCart: {
+				bookCount: 0,
+				totalPrice: 0,
+				books: []
+			}
 		};
 
 		_this.handleCategoryFilter = _this.handleCategoryFilter.bind(_this);
 		_this.handleSearch = _this.handleSearch.bind(_this);
+		_this.handleCart = _this.handleCart.bind(_this);
 		return _this;
 	}
 
@@ -98,6 +104,90 @@ var App = function (_Component) {
 				searchInput: searchInput
 			});
 		}
+
+		//operation for the cart interaction (add or remove book)
+		//search for the book id in the user's cart
+		//TODO bug: add two copies of one book A, then add a different book B, remove that book B, then remove the original book A
+
+	}, {
+		key: 'handleCart',
+		value: function handleCart(op, id, count, bookProps) {
+			var booksInCart = this.state.booksInCart;
+			var books = booksInCart.books;
+			//new book object for cart containing the book iteslf and the amount of that book in the cart
+			var bookInCart = {
+				book: null,
+				count: 0
+			};
+
+			var _iteratorNormalCompletion = true;
+			var _didIteratorError = false;
+			var _iteratorError = undefined;
+
+			try {
+				for (var _iterator = books[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+					var b = _step.value;
+
+					if (b.book['_id'] == id) {
+						bookInCart = b;
+					}
+				}
+			} catch (err) {
+				_didIteratorError = true;
+				_iteratorError = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion && _iterator.return) {
+						_iterator.return();
+					}
+				} finally {
+					if (_didIteratorError) {
+						throw _iteratorError;
+					}
+				}
+			}
+
+			if (op === 'add') {
+				//adding a new book to the cart
+				if (bookInCart.book === undefined || bookInCart.book === null) {
+					bookInCart = {
+						book: bookProps,
+						count: 1
+					};
+
+					//add the book to the cart
+					booksInCart.books.push(bookInCart);
+				} else {
+					bookInCart.count++;
+				}
+				//book price comes as string
+				booksInCart.totalPrice += parseFloat(bookInCart.book.price.replace(',', '.'));
+				booksInCart.bookCount++;
+			} else if (op === 'subtract') {
+				bookInCart.count--;
+
+				//remove the book if the count is 0
+				if (bookInCart.count === 0) {
+					books.splice(bookInCart, 1);
+				}
+
+				//book price comes as string
+				booksInCart.totalPrice -= parseFloat(bookInCart.book.price.replace(',', '.'));
+
+				//account for small offsets while subtracting floats, can probably be fixed by continuously fixing
+				//the additions and subtractiong to two decimal places
+				if (booksInCart.totalPrice > -0.01 && booksInCart.totalPrice < 0) {
+					booksInCart.totalPrice = 0;
+				}
+
+				booksInCart.bookCount--;
+			}
+
+			this.setState(function (prevState, props) {
+				console.log(booksInCart);
+				return { booksInCart: booksInCart };
+			});
+		}
 	}, {
 		key: 'render',
 		value: function render() {
@@ -106,12 +196,15 @@ var App = function (_Component) {
 				null,
 				_react2.default.createElement(_NavBar2.default, {
 					handleCategoryFilter: this.handleCategoryFilter,
-					handleSearch: this.handleSearch
+					handleSearch: this.handleSearch,
+					booksInCart: this.state.booksInCart
 				}),
 				_react2.default.createElement(_BookCollection2.default, {
 					url: 'http://localhost:3001/api/books',
 					filterGenre: this.state.genre,
-					searchInput: this.state.searchInput
+					searchInput: this.state.searchInput,
+					booksInCart: this.state.booksInCart,
+					handleCart: this.handleCart
 				})
 			);
 		}
@@ -294,6 +387,14 @@ var BookCollection = function (_Component) {
 
 			var books = this.state.books.map(function (book, index) {
 				var id = book._id;
+				var count = 0;
+
+				for (var item in _this6.props.booksInCart) {
+					if (item['_id'] == id) {
+						count = item.count;
+					}
+				}
+
 				return _react2.default.createElement(_Book2.default, {
 					author: book.author,
 					title: book.title,
@@ -301,10 +402,13 @@ var BookCollection = function (_Component) {
 					description: book.description,
 					price: book.price,
 					image: book.image,
+					count: count,
+					book: book,
 					key: book['_id'],
 					uniqueID: book['_id'],
 					onBookDelete: _this6.handleBookDelete,
-					onBookUpdate: _this6.handleBookUpdate
+					onBookUpdate: _this6.handleBookUpdate,
+					handleCart: _this6.props.handleCart
 				});
 			});
 
@@ -348,6 +452,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+//for now this is a presentational component that could be extended to be a user submitted/posted book
 var Book = function (_Component) {
 	_inherits(Book, _Component);
 
@@ -367,64 +472,41 @@ var Book = function (_Component) {
 				large: ''
 			},
 			price: '',
-			inCart: false
+			inCart: false,
+			count: _this.props.count
 		};
 
-		//binding all our functions to this class
-		_this.deleteBook = _this.deleteBook.bind(_this);
-		_this.updateBook = _this.updateBook.bind(_this);
-		_this.handleAuthorChange = _this.handleAuthorChange.bind(_this);
-		_this.handleTextChange = _this.handleTextChange.bind(_this);
-		_this.handleBookUpdate = _this.handleBookUpdate.bind(_this);
+		_this.handleIncrement = _this.handleIncrement.bind(_this);
+		_this.handleDecrement = _this.handleDecrement.bind(_this);
 		return _this;
 	}
 
 	_createClass(Book, [{
-		key: 'updateBook',
-		value: function updateBook(e) {
-			e.preventDefault();
-			//brings up the update field when we click on the update link.
-			this.setState({ toBeUpdated: !this.state.toBeUpdated });
-		}
-	}, {
-		key: 'handleBookUpdate',
-		value: function handleBookUpdate(e) {
-			e.preventDefault();
+		key: 'handleIncrement',
+		value: function handleIncrement() {
 			var id = this.props.uniqueID;
-			//if author or text changed, set it. if not, leave null and our PUT
-			//request will ignore it.
-			var author = this.state.author ? this.state.author : null;
-			// let text = this.state.text ? this.state.text : null;
-			var book = { author: author };
-			this.props.onBookUpdate(id, book);
-			this.setState({
-				toBeUpdated: !this.state.toBeUpdated,
-				author: ''
+			this.props.handleCart('add', id, this.state.count, this.props.book);
+			this.setState(function (prevState, props) {
+				count: prevState.count++;
 			});
 		}
 	}, {
-		key: 'deleteBook',
-		value: function deleteBook(e) {
-			e.preventDefault();
+		key: 'handleDecrement',
+		value: function handleDecrement() {
 			var id = this.props.uniqueID;
-			this.props.onBookDelete(id);
-			console.log('oops deleted');
-		}
-	}, {
-		key: 'handleTextChange',
-		value: function handleTextChange(e) {
-			this.setState({ text: e.target.value });
-		}
-	}, {
-		key: 'handleAuthorChange',
-		value: function handleAuthorChange(e) {
-			this.setState({ author: e.target.value });
+			this.props.handleCart('subtract', id, this.state.count);
+			//check for negative amount of books
+			if (this.state.count > 0) {
+				this.setState(function (prevState, props) {
+					count: prevState.count--;
+				});
+			}
 		}
 	}, {
 		key: 'render',
 		value: function render() {
 			if (!this.props.title) {
-				// return null;
+				return null;
 			}
 			return _react2.default.createElement(
 				'div',
@@ -446,15 +528,16 @@ var Book = function (_Component) {
 				this.props.price,
 				_react2.default.createElement('br', null),
 				_react2.default.createElement(
-					'a',
-					{ href: '#', onClick: this.updateBook },
-					'update'
+					'button',
+					{ onClick: this.handleIncrement },
+					'+'
 				),
-				_react2.default.createElement(
-					'a',
-					{ href: '#', onClick: this.deleteBook },
-					'delete'
-				),
+				this.state.count,
+				this.state.count > 0 ? _react2.default.createElement(
+					'button',
+					{ onClick: this.handleDecrement },
+					'-'
+				) : null,
 				this.state.toBeUpdated ? _react2.default.createElement(
 					'form',
 					{ onSubmit: this.handleBookUpdate },
@@ -478,6 +561,42 @@ var Book = function (_Component) {
 
 	return Book;
 }(_react.Component);
+
+//deprecated methods that could be used to update or delete a user's posted book
+
+// handleTextChange(e) {
+// 	this.setState({ text: e.target.value });
+// }
+// handleAuthorChange(e) {
+// 	this.setState({ author: e.target.value });
+// }
+// updateBook(e) {
+// 	e.preventDefault();
+// 	//brings up the update field when we click on the update link.
+// 	this.setState({ toBeUpdated: !this.state.toBeUpdated });
+// }
+// handleBookUpdate(e) {
+// 	e.preventDefault();
+// 	let id = this.props.uniqueID;
+// 	//if author or text changed, set it. if not, leave null and our PUT
+// 	//request will ignore it.
+// 	let author = this.state.author ? this.state.author : null;
+// 	// let text = this.state.text ? this.state.text : null;
+// 	let book = { author };
+// 	this.props.onBookUpdate(id, book);
+// 	this.setState({
+// 		toBeUpdated: !this.state.toBeUpdated,
+// 		author: ''
+// 	});
+// }
+
+// deleteBook(e) {
+// 	e.preventDefault();
+// 	let id = this.props.uniqueID;
+// 	this.props.onBookDelete(id);
+// 	console.log('oops deleted');
+// }
+
 
 exports.default = Book;
 
@@ -690,7 +809,7 @@ var NavBar = function (_Component) {
 						"button",
 						{ id: "cart" },
 						"Cart ",
-						this.props.bookCount
+						this.props.booksInCart.bookCount
 					)
 				)
 			);

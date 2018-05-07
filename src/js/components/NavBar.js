@@ -51,7 +51,7 @@ export default class NavBar extends Component {
 				</select>
 
 				<div className="cart">
-					<button id="cart">Cart {this.props.bookCount}</button>
+					<button id="cart">Cart {this.props.booksInCart.bookCount}</button>
 				</div>
 			</div>
 		);
