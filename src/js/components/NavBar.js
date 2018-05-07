@@ -51,7 +51,9 @@ export default class NavBar extends Component {
 				</select>
 
 				<div className="cart">
-					<button id="cart">Cart {this.props.booksInCart.bookCount}</button>
+					<button id="cart" onClick={this.props.handleViewCart}>
+						Cart {this.props.bookCount}
+					</button>
 				</div>
 			</div>
 		);

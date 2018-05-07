@@ -85,6 +85,7 @@ var App = function (_Component) {
 		_this.handleCategoryFilter = _this.handleCategoryFilter.bind(_this);
 		_this.handleSearch = _this.handleSearch.bind(_this);
 		_this.handleCart = _this.handleCart.bind(_this);
+		_this.handleViewCart = _this.handleViewCart.bind(_this);
 		return _this;
 	}
 
@@ -188,6 +189,11 @@ var App = function (_Component) {
 			});
 		}
 	}, {
+		key: 'handleViewCart',
+		value: function handleViewCart() {
+			console.log('current cart', this.state.booksInCart);
+		}
+	}, {
 		key: 'render',
 		value: function render() {
 			return _react2.default.createElement(
@@ -196,7 +202,8 @@ var App = function (_Component) {
 				_react2.default.createElement(_NavBar2.default, {
 					handleCategoryFilter: this.handleCategoryFilter,
 					handleSearch: this.handleSearch,
-					booksInCart: this.state.booksInCart
+					bookCount: this.state.booksInCart.bookCount,
+					handleViewCart: this.handleViewCart
 				}),
 				_react2.default.createElement(_BookCollection2.default, {
 					url: 'http://localhost:3001/api/books',
@@ -806,9 +813,9 @@ var NavBar = function (_Component) {
 					{ className: "cart" },
 					_react2.default.createElement(
 						"button",
-						{ id: "cart" },
+						{ id: "cart", onClick: this.props.handleViewCart },
 						"Cart ",
-						this.props.booksInCart.bookCount
+						this.props.bookCount
 					)
 				)
 			);

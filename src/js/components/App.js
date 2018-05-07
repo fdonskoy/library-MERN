@@ -20,6 +20,7 @@ export default class App extends Component {
 		this.handleCategoryFilter = this.handleCategoryFilter.bind(this);
 		this.handleSearch = this.handleSearch.bind(this);
 		this.handleCart = this.handleCart.bind(this);
+		this.handleViewCart = this.handleViewCart.bind(this);
 	}
 
 	handleCategoryFilter(genre) {
@@ -99,13 +100,18 @@ export default class App extends Component {
 		});
 	}
 
+	handleViewCart() {
+		console.log('current cart', this.state.booksInCart);
+	}
+
 	render() {
 		return (
 			<div>
 				<NavBar
 					handleCategoryFilter={this.handleCategoryFilter}
 					handleSearch={this.handleSearch}
-					booksInCart={this.state.booksInCart}
+					bookCount={this.state.booksInCart.bookCount}
+					handleViewCart={this.handleViewCart}
 				/>
 				<BookCollection
 					url="http://localhost:3001/api/books"
