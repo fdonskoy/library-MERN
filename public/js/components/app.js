@@ -107,7 +107,6 @@ var App = function (_Component) {
 
 		//operation for the cart interaction (add or remove book)
 		//search for the book id in the user's cart
-		//TODO bug: add two copies of one book A, then add a different book B, remove that book B, then remove the original book A
 
 	}, {
 		key: 'handleCart',
@@ -168,7 +167,7 @@ var App = function (_Component) {
 
 				//remove the book if the count is 0
 				if (bookInCart.count === 0) {
-					books.splice(bookInCart, 1);
+					books.splice(books.indexOf(bookInCart), 1);
 				}
 
 				//book price comes as string
